@@ -93,8 +93,8 @@ export const DydxDepositModal = ({ aarcModal }: { aarcModal: AarcFundKitModal })
 
                     {/* Amount Input */}
                     <div className="w-full">
-                        <a href="https://v1.jojo.exchange/trade/base/BTC-USDC" target="_blank" rel="noopener noreferrer" className="block">
-                            <h3 className="text-[14px] font-semibold text-[#F6F6F6] mb-4">Deposit in <span className="underline text-[#A5E547]">JOJO v1</span></h3>
+                        <a href="https://dydx.trade/trade/BTC-USD" target="_blank" rel="noopener noreferrer" className="block">
+                            <h3 className="text-[14px] font-semibold text-[#F6F6F6] mb-4">Deposit in <span className="underline text-[#A5E547]">dydx</span></h3>
                         </a>
                         <div className="flex items-center p-3 bg-[#2A2A2A] border border-[#424242] rounded-2xl">
                             <div className="flex items-center gap-3">
