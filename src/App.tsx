@@ -6,7 +6,7 @@ import { AarcFundKitModal } from '@aarc-xyz/fundkit-web-sdk';
 import { useRef } from 'react';
 import { AarcEthWalletConnector, wagmiConfig } from '@aarc-xyz/eth-connector';
 import { aarcConfig } from './config/aarcConfig';
-import DepositModal from './components/JojoDepositModal';
+import DepositModal from './components/DydxDepositModal';
 
 declare global {
   interface Window {
@@ -18,7 +18,7 @@ const queryClient = new QueryClient();
 
 function App() {
   const aarcModalRef = useRef(
-    new AarcFundKitModal(aarcConfig)
+    new AarcFundKitModal(aarcConfig, "dev", "https://deploy-preview-194--iframe-widget-v3.netlify.app")
   );
 
   const aarcModal = aarcModalRef.current;

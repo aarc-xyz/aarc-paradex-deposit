@@ -5,10 +5,10 @@ import {
   TransactionErrorData,
   SourceConnectorName,
 } from "@aarc-xyz/fundkit-web-sdk";
-import { JOJO_DEPOSIT_ADDRESS, SupportedChainId } from "../constants";
+import { DYDX_NOBLE_DEPOSIT_ADDRESS, SupportedChainId, USDC_ON_ARBITRUM_ADDRESS } from "../constants";
 
 export const aarcConfig: FKConfig = {
-  appName: "JOJO x Aarc",
+  appName: "DYDX x Aarc",
   module: {
     exchange: {
       enabled: true,
@@ -26,14 +26,14 @@ export const aarcConfig: FKConfig = {
   },
   destination: {
     contract: {
-      contractAddress: JOJO_DEPOSIT_ADDRESS[SupportedChainId.BASE],
-      contractName: "JOJO v1 Deposit",
+      contractAddress: DYDX_NOBLE_DEPOSIT_ADDRESS[SupportedChainId.ARBITRUM],
+      contractName: "DYDX Deposit",
       contractPayload: "0x", // This will be updated dynamically
       contractGasLimit: "300000", // Standard gas limit, can be adjusted if needed
     },
-    walletAddress: JOJO_DEPOSIT_ADDRESS[SupportedChainId.BASE],
-    chainId: 8453, // Base chain ID
-    tokenAddress: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", // USDC on Base
+    walletAddress: DYDX_NOBLE_DEPOSIT_ADDRESS[SupportedChainId.ARBITRUM],
+    chainId: SupportedChainId.ARBITRUM, // Arbitrum chain ID
+    tokenAddress: USDC_ON_ARBITRUM_ADDRESS, // USDC on Arbitrum
   },
   appearance: {
     roundness: 42,

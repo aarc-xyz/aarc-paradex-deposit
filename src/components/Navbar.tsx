@@ -20,9 +20,9 @@ export const Navbar = ({ handleDisconnect }: { handleDisconnect: () => void }) =
                         className="w-6 h-6"
                     />
                     <img
-                        className="h-4 w-18"
-                        src="/jojo-name-logo.png"
-                        alt="Jojo Logo"
+                        className="h-6 w-18"
+                        src="/dydx-name-logo.png"
+                        alt="Dydx Logo"
                     />
                 </div>
                 <div className="flex items-center space-x-4">
