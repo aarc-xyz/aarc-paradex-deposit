@@ -5,10 +5,10 @@ import {
   TransactionErrorData,
   SourceConnectorName,
 } from "@aarc-xyz/fundkit-web-sdk";
-import { DYDX_NOBLE_DEPOSIT_ADDRESS, SupportedChainId, USDC_ON_ARBITRUM_ADDRESS } from "../constants";
+import { PARADEX_LAYERSWAP_DEPOSIT_ADDRESS, SupportedChainId, USDC_ON_ARBITRUM_ADDRESS } from "../constants";
 
 export const aarcConfig: FKConfig = {
-  appName: "DYDX x Aarc",
+  appName: "Paradex x Aarc",
   module: {
     exchange: {
       enabled: true,
@@ -25,13 +25,7 @@ export const aarcConfig: FKConfig = {
     },
   },
   destination: {
-    contract: {
-      contractAddress: DYDX_NOBLE_DEPOSIT_ADDRESS[SupportedChainId.ARBITRUM],
-      contractName: "DYDX Deposit",
-      contractPayload: "0x", // This will be updated dynamically
-      contractGasLimit: "300000", // Standard gas limit, can be adjusted if needed
-    },
-    walletAddress: DYDX_NOBLE_DEPOSIT_ADDRESS[SupportedChainId.ARBITRUM],
+    walletAddress: PARADEX_LAYERSWAP_DEPOSIT_ADDRESS[SupportedChainId.ARBITRUM],
     chainId: SupportedChainId.ARBITRUM, // Arbitrum chain ID
     tokenAddress: USDC_ON_ARBITRUM_ADDRESS, // USDC on Arbitrum
   },

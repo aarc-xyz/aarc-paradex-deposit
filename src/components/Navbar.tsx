@@ -21,8 +21,8 @@ export const Navbar = ({ handleDisconnect }: { handleDisconnect: () => void }) =
                     />
                     <img
                         className="h-6 w-18"
-                        src="/dydx-name-logo.png"
-                        alt="Dydx Logo"
+                        src="/paradex-name-logo.svg"
+                        alt="paradex Logo"
                     />
                 </div>
                 <div className="flex items-center space-x-4">
