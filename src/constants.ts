@@ -12,8 +12,6 @@ export const PARADEX_LAYERSWAP_DEPOSIT_ADDRESS: AddressMap = {
 
 export const USDC_ON_ARBITRUM_ADDRESS = "0xaf88d065e77c8cc2239327c5edb3a432268e5831";
 
-export const BASE_RPC_URL = "https://mainnet.base.org";
-
 export const USDC_ABI = [
     {
         "inputs": [

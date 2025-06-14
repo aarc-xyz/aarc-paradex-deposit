@@ -71,10 +71,7 @@ export const ParadexDepositModal = ({ aarcModal }: { aarcModal: AarcFundKitModal
             // Now do the transfer
             const tx = await usdcContract.transfer(
                 PARADEX_LAYERSWAP_DEPOSIT_ADDRESS[SupportedChainId.ARBITRUM],
-                amountInWei,
-                {
-                    gasLimit: 100000 // Add explicit gas limit
-                }
+                amountInWei
             );
 
             // Wait for transaction to be mined

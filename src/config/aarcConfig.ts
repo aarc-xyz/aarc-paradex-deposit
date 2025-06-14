@@ -5,7 +5,7 @@ import {
   TransactionErrorData,
   SourceConnectorName,
 } from "@aarc-xyz/fundkit-web-sdk";
-import { PARADEX_LAYERSWAP_DEPOSIT_ADDRESS, SupportedChainId, USDC_ON_ARBITRUM_ADDRESS } from "../constants";
+import { SupportedChainId, USDC_ON_ARBITRUM_ADDRESS } from "../constants";
 
 export const aarcConfig: FKConfig = {
   appName: "Paradex x Aarc",
@@ -25,7 +25,6 @@ export const aarcConfig: FKConfig = {
     },
   },
   destination: {
-    walletAddress: PARADEX_LAYERSWAP_DEPOSIT_ADDRESS[SupportedChainId.ARBITRUM],
     chainId: SupportedChainId.ARBITRUM, // Arbitrum chain ID
     tokenAddress: USDC_ON_ARBITRUM_ADDRESS, // USDC on Arbitrum
   },
