@@ -48,8 +48,6 @@ export const ParadexDepositModal = ({ aarcModal }: { aarcModal: AarcFundKitModal
                     destination_token: "USDC",
                     source_address: address,
                     destination_address: paradexAddress,
-                    refuel: false,
-                    reference_id: "1"
                 })
             });
 
