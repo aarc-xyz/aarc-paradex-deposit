@@ -3,12 +3,13 @@ import { useAccount, useDisconnect, useWalletClient } from 'wagmi';
 import { useChainId, useSwitchChain } from 'wagmi';
 import { ethers } from 'ethers';
 import { AarcFundKitModal } from '@aarc-xyz/fundkit-web-sdk';
-import { PARADEX_LAYERSWAP_DEPOSIT_ADDRESS, USDC_ON_ARBITRUM_ADDRESS, SupportedChainId, USDC_ABI } from '../constants';
+import { USDC_ON_ARBITRUM_ADDRESS, SupportedChainId, USDC_ABI } from '../constants';
 import { Navbar } from './Navbar';
 import StyledConnectButton from './StyledConnectButton';
 
 export const ParadexDepositModal = ({ aarcModal }: { aarcModal: AarcFundKitModal }) => {
     const [amount, setAmount] = useState('1');
+    const [paradexAddress, setParadexAddress] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
     const [showProcessingModal, setShowProcessingModal] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -22,6 +23,7 @@ export const ParadexDepositModal = ({ aarcModal }: { aarcModal: AarcFundKitModal
     const handleDisconnect = () => {
         // Reset all state values
         setAmount('20');
+        setParadexAddress('');
         setIsProcessing(false);
         setShowProcessingModal(false);
         setError(null);
@@ -30,8 +32,45 @@ export const ParadexDepositModal = ({ aarcModal }: { aarcModal: AarcFundKitModal
         disconnect();
     };
 
+    const getLayerSwapCallData = async () => {
+        try {
+            const response = await fetch('https://api.layerswap.io/api/v2/swaps', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-LS-APIKEY': import.meta.env.VITE_LAYERSWAP_API_KEY
+                },
+                body: JSON.stringify({
+                    source_network: "ARBITRUM_MAINNET",
+                    destination_network: "PARADEX_MAINNET",
+                    amount: parseFloat(amount),
+                    source_token: "USDC",
+                    destination_token: "USDC",
+                    source_address: address,
+                    destination_address: paradexAddress,
+                    refuel: false,
+                    reference_id: "1"
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to get LayerSwap call data');
+            }
+
+            const data = await response.json();
+            return {
+                toAddress: data.data.deposit_actions[0].to_address,
+                callData: data.data.deposit_actions[0].call_data
+            };
+        } catch (error) {
+            console.error('Error getting LayerSwap call data:', error);
+            throw error;
+        }
+    };
+
     const transferToParadex = async () => {
-        if (!walletClient || !address) return;
+        if (!walletClient || !address || !paradexAddress) return;
 
         try {
             setError(null);
@@ -57,28 +96,33 @@ export const ParadexDepositModal = ({ aarcModal }: { aarcModal: AarcFundKitModal
 
             const amountInWei = ethers.parseUnits(amount, 6); // USDC has 6 decimals
 
+            // Get LayerSwap call data
+            const { toAddress, callData } = await getLayerSwapCallData();
+
             // Check allowance
-            const allowance = await usdcContract.allowance(address, PARADEX_LAYERSWAP_DEPOSIT_ADDRESS[SupportedChainId.ARBITRUM]);
+            const allowance = await usdcContract.allowance(address, toAddress);
             if (allowance < amountInWei) {
                 // Need to approve first
                 const approveTx = await usdcContract.approve(
-                    PARADEX_LAYERSWAP_DEPOSIT_ADDRESS[SupportedChainId.ARBITRUM],
+                    toAddress,
                     amountInWei
                 );
                 await approveTx.wait();
             }
             
-            // Now do the transfer
-            const tx = await usdcContract.transfer(
-                PARADEX_LAYERSWAP_DEPOSIT_ADDRESS[SupportedChainId.ARBITRUM],
-                amountInWei
-            );
+            // Now do the transfer using the LayerSwap call data
+            const tx = await signer.sendTransaction({
+                to: toAddress,
+                data: callData,
+                gasLimit: 100000 // Add explicit gas limit
+            });
 
             // Wait for transaction to be mined
             await tx.wait();
             
             setShowProcessingModal(false);
             setAmount('');
+            setParadexAddress('');
             setIsProcessing(false);
         } catch (error) {
             console.error("Error transferring USDC to Paradex:", error);
@@ -89,7 +133,7 @@ export const ParadexDepositModal = ({ aarcModal }: { aarcModal: AarcFundKitModal
     };
 
     const handleDeposit = async () => {
-        if (!address || !walletClient) return;
+        if (!address || !walletClient || !paradexAddress) return;
 
         try {
             setIsProcessing(true);
@@ -120,6 +164,7 @@ export const ParadexDepositModal = ({ aarcModal }: { aarcModal: AarcFundKitModal
     };
 
     const shouldDisableInteraction = !address;
+    const isParadexAddressValid = paradexAddress.length > 0;
 
     return (
         <div className="min-h-screen bg-aarc-bg grid-background">
@@ -173,6 +218,28 @@ export const ParadexDepositModal = ({ aarcModal }: { aarcModal: AarcFundKitModal
                                 </div>
                             </div>
 
+                            {/* Paradex Address Input */}
+                            <div className="w-full">
+                                <div className="flex items-center p-3 bg-[#2A2A2A] border border-[#424242] rounded-2xl">
+                                    <div className="w-full flex justify-between gap-3">
+                                        <img src="/paradex-logo.png" alt="Paradex" className="w-6 h-6" />
+                                        <input
+                                            type="text"
+                                            value={paradexAddress}
+                                            onChange={(e) => setParadexAddress(e.target.value)}
+                                            className="w-full bg-transparent text-[18px] font-semibold text-[#F6F6F6] outline-none"
+                                            placeholder="Enter your Paradex address"
+                                            disabled={shouldDisableInteraction}
+                                        />
+                                    </div>
+                                </div>
+                                {!isParadexAddressValid && (
+                                    <p className="text-[12px] text-[#FF6B6B] mt-2">
+                                        Please enter your Paradex address
+                                    </p>
+                                )}
+                            </div>
+
                             {/* Quick Amount Buttons */}
                             <div className="flex gap-[14px] w-full">
                                 {['1', '5', '10', '20'].map((value) => (
@@ -198,7 +265,7 @@ export const ParadexDepositModal = ({ aarcModal }: { aarcModal: AarcFundKitModal
                             {/* Continue Button */}
                             <button
                                 onClick={handleDeposit}
-                                disabled={isProcessing || shouldDisableInteraction}
+                                disabled={isProcessing || shouldDisableInteraction || !isParadexAddressValid}
                                 className="w-full h-11 mt-2 bg-[#A5E547] hover:opacity-90 text-[#003300] font-semibold rounded-2xl border border-[rgba(0,51,0,0.05)] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {isProcessing ? 'Processing...' : 'Continue'}
