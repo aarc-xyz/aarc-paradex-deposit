@@ -4,11 +4,13 @@ import {
   TransactionSuccessData,
   TransactionErrorData,
   SourceConnectorName,
-} from "@aarc-xyz/fundkit-web-sdk";
+} from "@aarc-dev/fundkit-web-sdk";
 import { SupportedChainId, USDC_ON_ARBITRUM_ADDRESS } from "../constants";
 
 export const aarcConfig: FKConfig = {
   appName: "Paradex x Aarc",
+  userId: "0x",
+  dappId: "paradex",
   module: {
     exchange: {
       enabled: true,

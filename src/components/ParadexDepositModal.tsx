@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAccount, useDisconnect, useWalletClient } from 'wagmi';
 import { useChainId, useSwitchChain } from 'wagmi';
 import { ethers } from 'ethers';
-import { AarcFundKitModal } from '@aarc-xyz/fundkit-web-sdk';
+import { AarcFundKitModal } from '@aarc-dev/fundkit-web-sdk';
 import { USDC_ON_ARBITRUM_ADDRESS, SupportedChainId, USDC_ABI } from '../constants';
 import { Navbar } from './Navbar';
 import StyledConnectButton from './StyledConnectButton';
