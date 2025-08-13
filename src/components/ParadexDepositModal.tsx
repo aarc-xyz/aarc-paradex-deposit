@@ -220,6 +220,12 @@ export const ParadexDepositModal = ({ aarcModal }: { aarcModal: AarcFundKitModal
                                 {!address && <StyledConnectButton />}
                             </div>
 
+                            <div className="w-full">
+                                <a href="https://app.paradex.trade/portfolio?primary_tab=balances&active_tab=spot" target="_blank" rel="noopener noreferrer" className="block">
+                                    <h3 className="text-[14px] font-semibold text-[#F6F6F6] mb-4">Deposit in <span className="underline text-[#A5E547]">PARADEX</span></h3>
+                                </a>
+                            </div>
+
                             {/* Paradex Address Input */}
                             <div className="w-full">
                                 <div className="flex items-center p-3 bg-[#2A2A2A] border border-[#424242] rounded-2xl">
@@ -235,6 +241,7 @@ export const ParadexDepositModal = ({ aarcModal }: { aarcModal: AarcFundKitModal
                                         />
                                     </div>
                                 </div>
+
                                 {!isParadexAddressValid && (
                                     <p className="text-[12px] text-[#FF6B6B] mt-2">
                                         Please enter your Paradex address
