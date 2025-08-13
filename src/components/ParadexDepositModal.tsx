@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAccount, useDisconnect, useWalletClient } from 'wagmi';
 import { useChainId, useSwitchChain } from 'wagmi';
 import { ethers } from 'ethers';
@@ -8,7 +8,7 @@ import { Navbar } from './Navbar';
 import StyledConnectButton from './StyledConnectButton';
 
 export const ParadexDepositModal = ({ aarcModal }: { aarcModal: AarcFundKitModal }) => {
-    const [amount, setAmount] = useState('1');
+    const [amount, setAmount] = useState('');
     const [paradexAddress, setParadexAddress] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
     const [showProcessingModal, setShowProcessingModal] = useState(false);
@@ -20,9 +20,30 @@ export const ParadexDepositModal = ({ aarcModal }: { aarcModal: AarcFundKitModal
     const chainId = useChainId();
     const { switchChain } = useSwitchChain();
 
+    useEffect(() => {
+        const handleReceiveMessage = async (event: MessageEvent) => {
+            // Handle messages from Aarc iframe
+            if (event?.data?.type === "depositAmountUSD") {
+                console.log("Received message from Aarc:", event.data);
+                const depositAmount = event.data.data;
+                console.log("depositAmount", depositAmount)
+                if (depositAmount) {
+                    setAmount(depositAmount.toString());
+                }
+            }
+        };
+
+        // Add event listener
+        window.addEventListener("message", handleReceiveMessage);
+
+        // Cleanup on unmount
+        return () => {
+            window.removeEventListener("message", handleReceiveMessage);
+        };
+    }, []);
+
     const handleDisconnect = () => {
         // Reset all state values
-        setAmount('20');
         setParadexAddress('');
         setIsProcessing(false);
         setShowProcessingModal(false);
@@ -69,6 +90,11 @@ export const ParadexDepositModal = ({ aarcModal }: { aarcModal: AarcFundKitModal
 
     const transferToParadex = async () => {
         if (!walletClient || !address || !paradexAddress) return;
+
+        if (!amount) {
+            setError("Please enter an amount");
+            return;
+        }
 
         try {
             setError(null);
@@ -194,28 +220,6 @@ export const ParadexDepositModal = ({ aarcModal }: { aarcModal: AarcFundKitModal
                                 {!address && <StyledConnectButton />}
                             </div>
 
-                            {/* Amount Input */}
-                            <div className="w-full">
-                                <a href="https://app.paradex.trade/portfolio?primary_tab=balances&active_tab=spot" target="_blank" rel="noopener noreferrer" className="block">
-                                    <h3 className="text-[14px] font-semibold text-[#F6F6F6] mb-4">Deposit in <span className="underline text-[#A5E547]">PARADEX</span></h3>
-                                </a>
-                                <div className="flex items-center p-3 bg-[#2A2A2A] border border-[#424242] rounded-2xl">
-                                    <div className="flex items-center gap-3">
-                                        <img src="/usdc-icon.svg" alt="USDC" className="w-6 h-6" />
-                                        <input
-                                            type="text"
-                                            inputMode="decimal"
-                                            pattern="^[0-9]*[.,]?[0-9]*$"
-                                            value={amount}
-                                            onChange={(e) => setAmount(e.target.value.replace(/[^0-9.]/g, ''))}
-                                            className="w-full bg-transparent text-[18px] font-semibold text-[#F6F6F6] outline-none"
-                                            placeholder="Enter amount"
-                                            disabled={shouldDisableInteraction}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
                             {/* Paradex Address Input */}
                             <div className="w-full">
                                 <div className="flex items-center p-3 bg-[#2A2A2A] border border-[#424242] rounded-2xl">
@@ -236,20 +240,6 @@ export const ParadexDepositModal = ({ aarcModal }: { aarcModal: AarcFundKitModal
                                         Please enter your Paradex address
                                     </p>
                                 )}
-                            </div>
-
-                            {/* Quick Amount Buttons */}
-                            <div className="flex gap-[14px] w-full">
-                                {['1', '5', '10', '20'].map((value) => (
-                                    <button
-                                        key={value}
-                                        onClick={() => setAmount(value)}
-                                        disabled={shouldDisableInteraction}
-                                        className="flex items-center justify-center px-2 py-2 bg-[rgba(83,83,83,0.2)] border border-[#424242] rounded-lg h-[34px] flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        <span className="text-[14px] font-semibold text-[#F6F6F6]">{value} USDC</span>
-                                    </button>
-                                ))}
                             </div>
 
                             {/* Warning Message */}
