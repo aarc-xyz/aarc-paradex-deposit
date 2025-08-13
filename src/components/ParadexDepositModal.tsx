@@ -22,23 +22,39 @@ export const ParadexDepositModal = ({ aarcModal }: { aarcModal: AarcFundKitModal
 
     useEffect(() => {
         const handleReceiveMessage = async (event: MessageEvent) => {
+            console.log("Message received:", event.data);
+            
             // Handle messages from Aarc iframe
             if (event?.data?.type === "depositAmountUSD") {
                 console.log("Received message from Aarc:", event.data);
                 const depositAmount = event.data.data;
-                console.log("depositAmount", depositAmount)
-                if (depositAmount) {
+                console.log("depositAmount", depositAmount);
+                
+                if (depositAmount && depositAmount > 0) {
+                    console.log("Setting amount to:", depositAmount);
                     setAmount(depositAmount.toString());
+                    
+                    // Store in localStorage for persistence
+                    localStorage.setItem('paradex_deposit_amount', depositAmount.toString());
                 }
             }
         };
 
+        // Check if we have a stored amount on mount
+        const storedAmount = localStorage.getItem('paradex_deposit_amount');
+        if (storedAmount && !amount) {
+            console.log("Restoring stored amount:", storedAmount);
+            setAmount(storedAmount);
+        }
+
         // Add event listener
         window.addEventListener("message", handleReceiveMessage);
+        console.log("Message listener added");
 
         // Cleanup on unmount
         return () => {
             window.removeEventListener("message", handleReceiveMessage);
+            console.log("Message listener removed");
         };
     }, []);
 
@@ -48,6 +64,10 @@ export const ParadexDepositModal = ({ aarcModal }: { aarcModal: AarcFundKitModal
         setIsProcessing(false);
         setShowProcessingModal(false);
         setError(null);
+        setAmount('');
+
+        // Clear stored amount from localStorage
+        localStorage.removeItem('paradex_deposit_amount');
 
         // Disconnect wallet
         disconnect();
@@ -103,7 +123,7 @@ export const ParadexDepositModal = ({ aarcModal }: { aarcModal: AarcFundKitModal
             // Check if we're on Arbitrum, if not switch
             if (chainId !== SupportedChainId.ARBITRUM) {
                 setShowProcessingModal(true);
-                await switchChain({ chainId: SupportedChainId.ARBITRUM });
+                switchChain({ chainId: SupportedChainId.ARBITRUM });
                 
                 // Wait for network switch to complete
                 await new Promise(resolve => setTimeout(resolve, 2000));
